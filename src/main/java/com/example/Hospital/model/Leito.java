@@ -1,24 +1,33 @@
 package com.example.Hospital.model;
 
-import com.example.Hospital.Enum.Status;
+import com.example.Hospital.Enum.StatusLeito;
 import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString(exclude = {"room", "patient"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Leito {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
+    @NotNull
     private String codigo;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusLeito status;
 
-    @ManyToOne
-    @JoinColumn(name = "quarto_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @ManyToOne

@@ -1,10 +1,9 @@
 package com.example.Hospital.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -14,4 +13,7 @@ public class Patient {
     private Long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "patient")
+    private List<Leito> leitos;
 }
