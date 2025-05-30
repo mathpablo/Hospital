@@ -1,0 +1,50 @@
+package com.example.Hospital.Controller;
+
+import com.example.Hospital.Dto.InternmentLogDto;
+import com.example.Hospital.Dto.InternmentPatientDto;
+import com.example.Hospital.Enum.Specialty;
+import com.example.Hospital.Service.InternmentService;
+import com.example.Hospital.Service.PatientService;
+import com.example.Hospital.model.InternmentLog;
+import com.example.Hospital.model.Patient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/internacoes")
+public class InternmentController {
+
+    private final InternmentService internmentService;
+    private final PatientService patientService;
+
+    @Autowired
+    public InternmentController(InternmentService internmentService, PatientService patientService) {
+        this.internmentService = internmentService;
+        this.patientService = patientService;
+    }
+
+    @PostMapping("/internar")
+    public ResponseEntity<InternmentLog> internarPaciente(@RequestBody InternmentPatientDto internarPacienteDTO) {
+        Patient patient = patientService.buscarPorId(internarPacienteDTO.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado com id " + internarPacienteDTO.getPatientId()));
+
+        String specialtyStr = internarPacienteDTO.getSpecialty();
+        if (specialtyStr == null) {
+            throw new RuntimeException("Especialidade não pode ser nula");
+        }
+        Specialty specialty = Specialty.valueOf(specialtyStr.toUpperCase());
+
+        InternmentLog internmentLog = internmentService.internarPaciente(patient, specialty);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(internmentLog);
+    }
+
+    @PutMapping("/alta/{intrernmentLogId}")
+    public ResponseEntity<InternmentLog> darAltaPaciente(@PathVariable Long internmentLogId){
+        InternmentLog alta = internmentService.darAltaPaciente(internmentLogId);
+        return ResponseEntity.ok(alta);
+    }
+
+}

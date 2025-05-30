@@ -23,7 +23,7 @@ public class AlaController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Ala> CriarAla(@RequestBody @Valid AlaCreateDto dto){
+    public ResponseEntity<Ala> criarAla(@RequestBody @Valid AlaCreateDto dto){
         Ala alaCriada = alaService.criarAlaComQuartosLeitos(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(alaCriada);
     }

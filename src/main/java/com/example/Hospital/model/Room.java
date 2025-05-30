@@ -1,6 +1,8 @@
 package com.example.Hospital.model;
 
 import com.example.Hospital.Enum.StatusLeito;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,6 +21,7 @@ public class Room {
 
     @ManyToOne
     @JoinColumn(name = "ala_id")
+    @JsonIgnore
     private Ala ala;
 
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

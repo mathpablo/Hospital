@@ -3,12 +3,11 @@ package com.example.Hospital.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-public class InternationalLog {
+public class InternmentLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,7 +17,7 @@ public class InternationalLog {
     private Leito leito;
 
     @ManyToOne
-    @JoinColumn(name = "pacient_id")
+    @JoinColumn(name = "patient_id")
     private Patient patient;
 
     private LocalDateTime dateInternamento;

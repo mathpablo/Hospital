@@ -10,10 +10,18 @@ import java.util.Optional;
 @Service
 public class PatientService {
 
-    @Autowired
-    private PatientRepository patientRepository;
+    private final PatientRepository patientRepository;
+
+    public PatientService(PatientRepository patientRepository) {
+        this.patientRepository = patientRepository;
+    }
+
+    public Patient save(Patient patient){
+        return patientRepository.save(patient);
+    }
 
     public Optional<Patient> buscarPorId(Long id) {
         return patientRepository.findById(id);
     }
 }
+
