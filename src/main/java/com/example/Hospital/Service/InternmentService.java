@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,23 +28,18 @@ public class InternmentService {
     private LeitoService leitoService;
 
     @Transactional
-    public InternmentLog internarPaciente(Patient patient, Specialty specialty) {
-        Optional<Leito> leitoDisponivel = leitoService.buscarLeitoDisponivelPorEspecialidade(specialty);
+   public  InternmentLog internarPaciente(Patient patient, Specialty specialty){
+        Leito leito = leitoService.buscarLeitoDisponivelPorEspecialidade(specialty)
+        .orElseThrow(() -> new RuntimeException("Nenhum leito disponível para a especialidade." + specialty));
 
-        if (leitoDisponivel.isEmpty()) {
-            throw new RuntimeException("Não há leito disponível para a especialidade " + specialty);
-        }
-
-        Leito leito = leitoDisponivel.get();
         leito.setStatus(StatusLeito.OCUPADO);
+        leitoRepository.save(leito);
 
         InternmentLog internmentLog = new InternmentLog();
         internmentLog.setPatient(patient);
         internmentLog.setLeito(leito);
         internmentLog.setDateInternamento(LocalDateTime.now());
-        internmentLog.setDataAlta(null);
 
-        leitoRepository.save(leito);
         return internmentRepository.save(internmentLog);
     }
 
@@ -53,16 +49,29 @@ public class InternmentService {
                 .orElseThrow(() -> new RuntimeException("Internação não encontrada."));
 
         if (internmentLog.getDataAlta() != null) {
-            throw new RuntimeException("Paciente já teve alta.");
+            throw new RuntimeException("Paciente já recebeu alta.");
         }
 
         internmentLog.setDataAlta(LocalDateTime.now());
 
         Leito leito = internmentLog.getLeito();
         leito.setStatus(StatusLeito.LIVRE);
-        leito.setPatient(null);
+        leitoRepository.save(leito);
 
         leitoRepository.save(leito);
         return internmentRepository.save(internmentLog);
     }
+
+    public List<InternmentLog> liatarTodos(){
+        return internmentRepository.findInternacoesAtivas();
+    }
+
+    public List<InternmentLog> listarAtivos(){
+        return internmentRepository.findInternacoesAtivas();
+    }
+
+    public List<InternmentLog> buscarPorPaciente(Long pacienteId) {
+        return internmentRepository.findByPatientId(pacienteId);
+    }
+
 }

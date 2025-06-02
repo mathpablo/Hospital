@@ -18,4 +18,27 @@ public class LeitoService {
     public Optional<Leito> buscarLeitoDisponivelPorEspecialidade(Specialty specialty){
         return leitoRepository.findFirstByRoom_Ala_SpecialtyAndStatus(specialty, StatusLeito.LIVRE);
     }
-}
+
+    public boolean atualizarStatus(Long id, String statusStr){
+        Optional<Leito> optionalLeito = leitoRepository.findById(id);
+        if (optionalLeito.isPresent()){
+            Leito leito = optionalLeito.get();
+            try {
+                StatusLeito status = StatusLeito.valueOf(statusStr.toUpperCase());
+            }catch (IllegalArgumentException e){
+            }
+            }
+        return false;
+        }
+
+        public boolean deletarLeito(Long id){
+        Optional<Leito>optionalLeito = leitoRepository.findById(id);
+        if (optionalLeito.isPresent()){
+            leitoRepository.deleteById(id);
+            return false;
+        }
+        return false;
+        }
+
+    }
+

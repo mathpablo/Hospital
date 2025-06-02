@@ -16,6 +16,7 @@ public interface LeitoRepository extends CrudRepository<Leito, Long> {
     Optional<Leito> findFirstByRoom_Ala_SpecialtyAndStatus(Specialty specialty, StatusLeito status);
 
     @Query("SELECT l.room.ala.specialty as specialty, COUNT(l) as quantidadeLeitosLivres " +
-            "FROM Leito l WHERE l.status = 'LIVRE' GROUP BY l.room.ala.specialty")
-    List<LeitoLivreProjection> contarLeitosLivresPorEspecialidade();
+            "FROM Leito l GROUP BY l.room.ala.specialty")
+    List<LeitoLivreProjection> contarLeitosLivresPorSpecialty();
+
 }
