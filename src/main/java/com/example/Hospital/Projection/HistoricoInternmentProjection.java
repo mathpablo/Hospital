@@ -5,9 +5,9 @@ import com.example.Hospital.Enum.Specialty;
 import java.time.LocalDateTime;
 
 public interface HistoricoInternmentProjection {
-    String getNomePatient();
+    String getPatientName();
     Specialty getSpecialty();
-    LocalDateTime getDataInternamento();
-    LocalDateTime getDataAlta();
+    LocalDateTime getAdmissionDate();
+    LocalDateTime getDischargeDate();
 
 }

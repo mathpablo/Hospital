@@ -6,7 +6,7 @@ import com.example.Hospital.Service.InternmentService;
 import com.example.Hospital.Service.PatientService;
 import com.example.Hospital.model.InternmentLog;
 import com.example.Hospital.model.Patient;
-import jakarta.annotation.PostConstruct;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ import java.util.List;
 @RequestMapping("/internacoes")
 public class InternmentController {
 
-    private  final InternmentService internmentService;
-    private  final PatientService patientService;
+    private final InternmentService internmentService;
+    private final PatientService patientService;
 
     @Autowired
     public InternmentController(InternmentService internmentService, PatientService patientService) {
@@ -28,7 +28,7 @@ public class InternmentController {
     }
 
     @PostMapping("/internar")
-    public ResponseEntity<InternmentLog> internarPaciente(@RequestBody InternmentPatientDto internarPacienteDTO) {
+    public ResponseEntity<InternmentLog> internarPaciente(@Valid @RequestBody InternmentPatientDto internarPacienteDTO) {
         Patient patient = patientService.buscarPorId(internarPacienteDTO.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Paciente não encontrado com id " + internarPacienteDTO.getPatientId()));
 
@@ -43,26 +43,20 @@ public class InternmentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(internmentLog);
     }
 
-    @PutMapping("/alta/{intrernmentLogId}")
-    public ResponseEntity<InternmentLog> darAltaPaciente(@PathVariable Long internmentLogId){
+    @PutMapping("/alta/{internmentLogId}")
+    public ResponseEntity<InternmentLog> darAltaPaciente(@PathVariable Long internmentLogId) {
         InternmentLog alta = internmentService.darAltaPaciente(internmentLogId);
         return ResponseEntity.ok(alta);
     }
 
-    @GetMapping
-    public ResponseEntity<List<InternmentLog>> listarTodos(){
-        return ResponseEntity.ok(internmentService.liatarTodos());
-    }
-
     @GetMapping("/ativos")
-    public ResponseEntity<List<InternmentLog>> listarAtivos(){
-        return ResponseEntity.ok(internmentService.listarAtivos());
+    public ResponseEntity<List<InternmentLog>> listarAtivos() {
+        return ResponseEntity.ok(internmentService.listarInternacoesAtivas());
     }
 
     @GetMapping("/paciente/{id}")
-    public ResponseEntity<List<InternmentLog>> listarPorPacientes(@PathVariable Long id){
+    public ResponseEntity<List<InternmentLog>> listarPorPaciente(@PathVariable Long id) {
         List<InternmentLog> internmentLogs = internmentService.buscarPorPaciente(id);
         return ResponseEntity.ok(internmentLogs);
     }
-
 }

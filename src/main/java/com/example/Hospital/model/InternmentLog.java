@@ -20,6 +20,9 @@ public class InternmentLog {
     @JoinColumn(name = "patient_id")
     private Patient patient;
 
+    @Column(name = "data_internamento")
     private LocalDateTime dateInternamento;
+
+    @Column(name = "data_alta")
     private LocalDateTime dataAlta;
 }
