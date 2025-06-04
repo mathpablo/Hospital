@@ -25,4 +25,7 @@ public class HospitalController {
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
+
+
+
 }

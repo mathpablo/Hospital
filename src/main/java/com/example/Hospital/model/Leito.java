@@ -1,5 +1,6 @@
 package com.example.Hospital.model;
 
+import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Enum.StatusLeito;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -19,6 +20,9 @@ public class Leito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private Specialty especialidade;
 
     @NotNull
     private String codigo;

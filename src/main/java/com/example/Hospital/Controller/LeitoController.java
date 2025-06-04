@@ -1,7 +1,8 @@
 package com.example.Hospital.Controller;
 
-import com.example.Hospital.Projection.LeitoLivreProjection;
-import com.example.Hospital.Repository.LeitoRepository;
+import com.example.Hospital.Dto.QuantidadeLeitoLivreDto;
+import com.example.Hospital.Dto.StatusDto;
+import com.example.Hospital.Projection.QuantidadeLeitoLivreProjection;
 import com.example.Hospital.Service.LeitoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,24 +14,28 @@ import java.util.List;
 @RequestMapping("/leitos")
 public class LeitoController {
 
-    @Autowired
-    private LeitoRepository leitoRepository;
 
     @Autowired
     private LeitoService leitoService;
 
-    @GetMapping("/livres")
-    public ResponseEntity<List<LeitoLivreProjection>> listarLeitosLivres() {
-        List<LeitoLivreProjection> leitosLivres = leitoRepository.contarLeitosLivresPorSpecialty();
-        System.out.println("Leitos livres encontrados: " + leitosLivres.size());
-        leitosLivres.forEach(l -> System.out.println(l.getSpecialty() + ": " + l.getQuantidadeLeitosLivres()));
-        return ResponseEntity.ok(leitosLivres);
+    @GetMapping("/quantidades-livres")
+    public ResponseEntity<List<QuantidadeLeitoLivreDto>> listarQuantidadeLeitosLivres() {
+        return ResponseEntity.ok(this.leitoService.listarQuantidadeDeLeitosLivres());
     }
+
+//    @GetMapping("/livres")
+//    public ResponseEntity<List<QuantidadeLeitoLivreProjection>> listarLeitosLivres() {
+//        List<QuantidadeLeitoLivreProjection> leitosLivres = leitoRepository.contarLeitosLivresPorSpecialty();
+//        System.out.println("Leitos livres encontrados: " + leitosLivres.size());
+//        leitosLivres.forEach(l -> System.out.println(l.getSpecialty() + ": " + l.getQuantidadeLeitosLivres()));
+//        return ResponseEntity.ok(leitosLivres);
+//    }
+
 
 
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> atualizarLeito(@PathVariable Long id, @RequestParam String status){
-        boolean atualizado = leitoService.atualizarStatus(id, status);
+    public ResponseEntity<?> atualizarLeito(@PathVariable Long id, @RequestBody StatusDto statusDto){
+        boolean atualizado = leitoService.atualizarStatus(id, statusDto.getStatus());
         if(atualizado){
             return ResponseEntity.ok().build();
         }else{

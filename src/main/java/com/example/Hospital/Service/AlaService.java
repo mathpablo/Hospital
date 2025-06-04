@@ -33,6 +33,7 @@ public class AlaService {
 
     @Transactional
     public Ala criarAlaComQuartosLeitos(AlaCreateDto dto) {
+
         Hospital hospital = hospitalRepository.findById(dto.getHospitalId())
                 .orElseThrow(() -> new RuntimeException("Hospital não encontrado"));
 

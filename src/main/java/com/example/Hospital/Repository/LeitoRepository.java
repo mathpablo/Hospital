@@ -1,6 +1,6 @@
 package com.example.Hospital.Repository;
 
-import com.example.Hospital.Projection.LeitoLivreProjection;
+import com.example.Hospital.Projection.QuantidadeLeitoLivreProjection;
 import com.example.Hospital.model.Leito;
 import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Enum.StatusLeito;
@@ -15,8 +15,11 @@ public interface LeitoRepository extends CrudRepository<Leito, Long> {
 
     Optional<Leito> findFirstByRoom_Ala_SpecialtyAndStatus(Specialty specialty, StatusLeito status);
 
-    @Query("SELECT l.room.ala.specialty as specialty, COUNT(l) as quantidadeLeitosLivres " +
-            "FROM Leito l GROUP BY l.room.ala.specialty")
-    List<LeitoLivreProjection> contarLeitosLivresPorSpecialty();
+    @Query("SELECT a.specialty AS specialty, COUNT(l) AS quantidadeLeitosLivres " +
+            "FROM Leito l JOIN l.room r JOIN r.ala a " +
+            "WHERE l.status = 'LIVRE' GROUP BY a.specialty")
+    List<QuantidadeLeitoLivreProjection> findLeitosLivresPorEspecialidade();
+
+
 
 }
