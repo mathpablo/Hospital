@@ -5,6 +5,7 @@ import com.example.Hospital.Enum.StatusLeito;
 import com.example.Hospital.Projection.HistoricoInternmentProjection;
 import com.example.Hospital.Repository.InternmentRepository;
 import com.example.Hospital.Repository.LeitoRepository;
+import com.example.Hospital.Repository.PatientRepository;
 import com.example.Hospital.Repository.RoomRepository;
 import com.example.Hospital.model.InternmentLog;
 import com.example.Hospital.model.Leito;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InternmentService {
@@ -35,6 +37,9 @@ public class InternmentService {
 
     @Autowired
     private RoomRepository roomRepository;
+
+    @Autowired
+    private PatientRepository patientRepository;
 
     @Transactional
     public InternmentLog internarPaciente(Patient patient, Specialty specialty) {
@@ -74,7 +79,6 @@ public class InternmentService {
     }
 
 
-
     @Transactional
     public InternmentLog darAltaPaciente(Long internmentLogId) {
         InternmentLog internmentLog = internmentRepository.findById(internmentLogId)
@@ -92,11 +96,11 @@ public class InternmentService {
         leitoRepository.save(leito);
 
         Room room = leito.getRoom();
-        if (room != null){
+        if (room != null) {
             boolean todosLivres = room.getLeitos().stream()
-            .allMatch(l -> l.getStatus() == StatusLeito.LIVRE);
+                    .allMatch(l -> l.getStatus() == StatusLeito.LIVRE);
 
-            if (todosLivres){
+            if (todosLivres) {
                 room.setStatus(StatusLeito.LIVRE);
                 roomRepository.save(room);
             }
@@ -120,4 +124,23 @@ public class InternmentService {
     public Page<HistoricoInternmentProjection> buscarHistoricoPaciente(Long patientId, Pageable pageable) {
         return internmentRepository.findHistoryByPatientId(patientId, pageable);
     }
+
+    public String getQuartoPacienteInternado(Long patientId) {
+        Optional<InternmentLog> internacaoAtiva = internmentRepository
+                .findByPatientIdAndDataAltaIsNull(patientId);
+
+        if (internacaoAtiva.isPresent()) {
+            Leito leito = internacaoAtiva.get().getLeito();
+            Room room = leito.getRoom();
+            return room.getCodigo();
+        }else{
+            throw  new RuntimeException("Paciente não está internado.");
+        }
+    }
+
 }
+
+
+
+
+

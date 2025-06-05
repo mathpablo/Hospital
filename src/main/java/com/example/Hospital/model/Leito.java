@@ -21,8 +21,9 @@ public class Leito {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Specialty especialidade;
+    @NotNull
+    @Enumerated(EnumType.ORDINAL)
+    private Specialty specialty;
 
     @NotNull
     private String codigo;

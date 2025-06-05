@@ -44,9 +44,11 @@ public class AlaService {
 
         String prefixoCoidgo = dto.getSpecialty().name().substring(0, 3).toUpperCase();
 
+
         for (int i = 1; i <= dto.getQuantidadeQuartos(); i++) {
             Room room = new Room();
             room.setAla(ala);
+            room.setHospital(hospital);
             room.setStatus(StatusLeito.LIVRE);
             room.setCodigo(prefixoCoidgo + i);
             room = roomRepository.save(room);
@@ -60,6 +62,7 @@ public class AlaService {
                 leitoRepository.save(leito);
             }
         }
+
         return ala;
     }
 

@@ -50,7 +50,7 @@ public class LeitoService {
         }
 
     public List<QuantidadeLeitoLivreDto> listarQuantidadeDeLeitosLivres() {
-        List<QuantidadeLeitoLivreProjection> projections = leitoRepository.contarLeitosLivresPorSpecialty();
+        List<QuantidadeLeitoLivreProjection> projections = leitoRepository.findLeitosLivresPorEspecialidade();
         List<QuantidadeLeitoLivreDto> quantidadeLeitoLivreDtos =  projections.stream().map(projection -> {
             QuantidadeLeitoLivreDto leitoLivreDto = new QuantidadeLeitoLivreDto();
             leitoLivreDto.setQuantidadeLeitoLivre(projection.getQuantidadeLeitosLivres());

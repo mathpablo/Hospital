@@ -16,6 +16,8 @@ public class InternmentLog {
     @JoinColumn(name = "leito_id")
     private Leito leito;
 
+
+
     @ManyToOne
     @JoinColumn(name = "patient_id")
     private Patient patient;

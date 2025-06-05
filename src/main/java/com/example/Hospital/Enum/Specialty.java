@@ -17,4 +17,18 @@ public enum Specialty {
     public String getCode(){
         return code;
     }
+
+    public static Specialty fromString(String str){
+        if(str == null){
+            throw new IllegalStateException("Especialidade não pode ser nula");
+        }
+        String normalized = str.trim().toUpperCase();
+
+        for (Specialty s: Specialty.values()){
+            if(s.name().equals(normalized) || s.code.equalsIgnoreCase(str.trim())){
+                return s ;
+            }
+        }
+        throw new IllegalStateException("Especialidae inválida" + str);
+    }
 }

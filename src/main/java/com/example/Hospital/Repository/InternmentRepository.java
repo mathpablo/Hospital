@@ -9,19 +9,22 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InternmentRepository extends JpaRepository<InternmentLog, Long> {
 
-    @Query(value = "SELECT p.nome as patientName, a.especialidade as specialty, i.data_internamento as admissionDate, i.data_alta as dischargeDate " +
+    @Query(value = "SELECT p.name as patientName, a.specialty as specialty, i.data_internamento as admissionDate, i.data_alta as dischargeDate " +
             "FROM internment_log i " +
             "JOIN patient p ON i.patient_id = p.id " +
             "JOIN leito l ON i.leito_id = l.id " +
             "JOIN room q ON l.room_id = q.id " +
             "JOIN ala a ON q.ala_id = a.id " +
-            "WHERE p.id = :patientId",
+            "WHERE p.id = :patientId " +
+            "ORDER BY i.data_internamento DESC",  // ordenação fixa aqui
             countQuery = "SELECT count(*) FROM internment_log i WHERE i.patient_id = :patientId",
             nativeQuery = true)
     Page<HistoricoInternmentProjection> findHistoryByPatientId(@Param("patientId") Long patientId, Pageable pageable);
+
 
     @Query("SELECT i FROM InternmentLog i WHERE i.dataAlta IS NULL")
     List<InternmentLog> findInternacoesAtivas();
@@ -31,5 +34,8 @@ public interface InternmentRepository extends JpaRepository<InternmentLog, Long>
     @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END " +
             "FROM InternmentLog i WHERE i.patient.id = :patientId AND i.dataAlta IS NULL")
     boolean existsByPatientIdAndInternacaoAtiva(@Param("patientId") Long patientId);
+
+    Optional<InternmentLog> findByPatientIdAndDataAltaIsNull(Long patientId);
+
 
 }

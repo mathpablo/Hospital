@@ -29,4 +29,10 @@ public class Room {
 
     @Enumerated(EnumType.STRING)
     private StatusLeito status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id")
+    private Hospital hospital;
+
+
 }
