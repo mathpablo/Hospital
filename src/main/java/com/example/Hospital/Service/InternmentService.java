@@ -3,6 +3,7 @@ package com.example.Hospital.Service;
 import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Enum.StatusLeito;
 import com.example.Hospital.Projection.HistoricoInternmentProjection;
+import com.example.Hospital.Projection.InternmentDetailProjection;
 import com.example.Hospital.Repository.InternmentRepository;
 import com.example.Hospital.Repository.LeitoRepository;
 import com.example.Hospital.Repository.PatientRepository;
@@ -53,6 +54,7 @@ public class InternmentService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum leito disponível para a especialidade: " + specialty));
 
         leito.setStatus(StatusLeito.OCUPADO);
+        leito.setSpecialty(specialty);
         leito.setPatient(patient);
         leito = leitoRepository.save(leito);
 
@@ -117,9 +119,6 @@ public class InternmentService {
         return internmentRepository.findInternacoesAtivas();
     }
 
-    public List<InternmentLog> buscarPorPaciente(Long pacienteId) {
-        return internmentRepository.findByPatientId(pacienteId);
-    }
 
     public Page<HistoricoInternmentProjection> buscarHistoricoPaciente(Long patientId, Pageable pageable) {
         return internmentRepository.findHistoryByPatientId(patientId, pageable);
@@ -138,9 +137,9 @@ public class InternmentService {
         }
     }
 
+    public Optional<InternmentDetailProjection> getDetalhesInternacaoAtivaPorPaciente(Long patientId) {
+        return internmentRepository.findInternacaoAtivaDetalhesPorPaciente(patientId);
+    }
+
+
 }
-
-
-
-
-

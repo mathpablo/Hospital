@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 public interface HistoricoInternmentProjection {
     String getPatientName();
     Specialty getSpecialty();
+    String getHospitalName();
     LocalDateTime getAdmissionDate();
     LocalDateTime getDischargeDate();
 

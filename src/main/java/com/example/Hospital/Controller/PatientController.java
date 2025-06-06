@@ -23,16 +23,7 @@ public class PatientController {
 
     @PostMapping("/create")
     public ResponseEntity<PatientDto> criarPaciente(@RequestBody @Valid PatientDto patientDto){
-        Patient patient = new Patient();
-        patient.setName(patientDto.getName());
-        patient.setDataNascimento(patientDto.getDataNascimento());
-
-        Patient saved = patientService.save(patient);
-        PatientDto responeDto = new PatientDto();
-        responeDto.setId(saved.getId());
-        responeDto.setName(saved.getName());
-        responeDto.setDataNascimento(saved.getDataNascimento());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responeDto);
+      PatientDto responseDto = patientService.create(patientDto);
+      return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }

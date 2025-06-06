@@ -21,7 +21,7 @@ public class Ala {
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
 
-    @OneToMany(mappedBy = "ala", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "ala", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Room> rooms;
 

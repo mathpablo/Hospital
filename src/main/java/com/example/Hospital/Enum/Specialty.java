@@ -12,6 +12,7 @@ public enum Specialty {
 
     Specialty(String code){
         this.code = code;
+
     }
 
     public String getCode(){

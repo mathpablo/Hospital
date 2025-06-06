@@ -24,6 +24,7 @@ public class Room {
     @JsonIgnore
     private Ala ala;
 
+
     @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Leito> leitos = new ArrayList<>();
 

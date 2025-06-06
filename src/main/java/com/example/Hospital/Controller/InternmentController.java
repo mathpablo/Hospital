@@ -76,6 +76,12 @@ public class InternmentController {
         return ResponseEntity.ok(page);
     }
 
+    @GetMapping("paciente/{id}")
+    public ResponseEntity<Object> buscarInternacoesAtivasPorPacientes(@PathVariable Long id){
+        return internmentService.getDetalhesInternacaoAtivaPorPaciente(id)
+                .<ResponseEntity<Object>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não está internado."));
+    }
 
 
 }
