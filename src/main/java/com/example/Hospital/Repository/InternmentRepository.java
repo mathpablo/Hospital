@@ -1,7 +1,9 @@
 package com.example.Hospital.Repository;
 
+import com.example.Hospital.Projection.HistoricoInternmentLeitoProjection;
 import com.example.Hospital.Projection.HistoricoInternmentProjection;
 import com.example.Hospital.Projection.InternmentDetailProjection;
+import com.example.Hospital.Projection.InternmentPatientProjection;
 import com.example.Hospital.model.InternmentLog;
 import com.example.Hospital.model.Leito;
 import jakarta.transaction.Transactional;
@@ -56,22 +58,54 @@ public interface InternmentRepository extends JpaRepository<InternmentLog, Long>
     void deleteByLeito(Leito leito);
 
     @Query("""
-    SELECT
-        h.name as hospitalName,
-        l.specialty as specialty,
-        r.codigo as codigo,
-        p.name as patientName,
-        il.dateInternamento as dataInternamento
-    FROM InternmentLog il
-    JOIN il.leito l
-    JOIN l.room r
-    JOIN r.ala a
-    JOIN a.hospital h
-    JOIN il.patient p
-    WHERE p.id = :patientId
-      AND il.dataAlta IS NULL
-""")
+                SELECT
+                    h.name as hospitalName,
+                    l.specialty as specialty,
+                    r.codigo as codigo,
+                    p.name as patientName,
+                    il.dateInternamento as dataInternamento
+                FROM InternmentLog il
+                JOIN il.leito l
+                JOIN l.room r
+                JOIN r.ala a
+                JOIN a.hospital h
+                JOIN il.patient p
+                WHERE p.id = :patientId
+                  AND il.dataAlta IS NULL
+            """)
     Optional<InternmentDetailProjection> findInternacaoAtivaDetalhesPorPaciente(@Param("patientId") Long patientId);
 
-}
+    @Query(value = """
+                SELECT
+                    p.name AS patientName,
+                    a.specialty AS specialty,
+                    i.data_internamento AS dataInternamento,
+                    DATE_PART('day', CURRENT_DATE - i.data_internamento) AS diasInternados
+                FROM internment_log i
+                JOIN patient p ON p.id = i.patient_id
+                JOIN leito l ON l.id = i.leito_id
+                JOIN room r ON r.id = l.room_id
+                JOIN ala a ON a.id = r.ala_id
+                WHERE i.data_alta IS NULL
+                ORDER BY a.specialty ASC, p.name ASC
+            """, nativeQuery = true)
+    List<InternmentPatientProjection> listarInternacoesAgrupadas();
 
+    @Query(value = """
+                SELECT
+                    h.name AS hospitalName,
+                    l.specialty AS specialty,
+                    r.codigo AS codigo,
+                    p.name AS patientName,
+                    il.data_internamento AS dataInternamento
+                FROM internment_log il
+                JOIN leito l ON il.leito_id = l.id
+                JOIN room r ON l.room_id = r.id
+                JOIN ala a ON r.ala_id = a.id
+                JOIN hospital h ON a.hospital_id = h.id
+                JOIN patient p ON il.patient_id = p.id
+                WHERE r.codigo = :codigoLeito
+                  AND il.data_alta IS NULL
+            """, nativeQuery = true)
+    List<HistoricoInternmentLeitoProjection> buscarHistoricoPorLeito(@Param("codigoLeito") String codigoLeito);
+}

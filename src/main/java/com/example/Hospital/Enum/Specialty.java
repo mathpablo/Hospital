@@ -1,6 +1,5 @@
 package com.example.Hospital.Enum;
 
-import lombok.Data;
 
 public enum Specialty {
     CARDIOLOGIA("CAR"),

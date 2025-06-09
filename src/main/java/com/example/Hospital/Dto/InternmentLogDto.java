@@ -10,14 +10,14 @@ public class InternmentLogDto {
     private Long id;
     private Long leitoId;
     private Long patientId;
-    private LocalDateTime dateInternamento;
+    private LocalDateTime dataInternamento;
     private LocalDateTime dataAlta;
 
     public InternmentLogDto(InternmentLog log) {
         this.id = log.getId();
         this.leitoId = log.getLeito().getId();
         this.patientId = log.getPatient().getId();
-        this.dateInternamento = log.getDateInternamento();
+        this.dataInternamento = log.getDateInternamento();
         this.dataAlta = log.getDataAlta();
     }
 }

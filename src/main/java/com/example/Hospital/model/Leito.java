@@ -22,7 +22,7 @@ public class Leito {
     private Long id;
 
     @NotNull
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Specialty specialty;
 
     @NotNull

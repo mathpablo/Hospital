@@ -2,8 +2,10 @@ package com.example.Hospital.Service;
 
 import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Enum.StatusLeito;
+import com.example.Hospital.Projection.HistoricoInternmentLeitoProjection;
 import com.example.Hospital.Projection.HistoricoInternmentProjection;
 import com.example.Hospital.Projection.InternmentDetailProjection;
+import com.example.Hospital.Projection.InternmentPatientProjection;
 import com.example.Hospital.Repository.InternmentRepository;
 import com.example.Hospital.Repository.LeitoRepository;
 import com.example.Hospital.Repository.PatientRepository;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.print.DocFlavor;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -139,6 +142,14 @@ public class InternmentService {
 
     public Optional<InternmentDetailProjection> getDetalhesInternacaoAtivaPorPaciente(Long patientId) {
         return internmentRepository.findInternacaoAtivaDetalhesPorPaciente(patientId);
+    }
+
+    public List<InternmentPatientProjection> listarPacientesInternadosPorEspecialidade(){
+        return internmentRepository.listarInternacoesAgrupadas();
+    }
+
+    public List<HistoricoInternmentLeitoProjection> buscarHistoricoPorLeito(String codigoLeito){
+        return internmentRepository.buscarHistoricoPorLeito(codigoLeito);
     }
 
 

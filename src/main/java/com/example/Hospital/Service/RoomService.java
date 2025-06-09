@@ -1,10 +1,14 @@
 package com.example.Hospital.Service;
 
+import com.example.Hospital.Enum.StatusLeito;
+import com.example.Hospital.Projection.RoomAvailableProjection;
 import com.example.Hospital.Repository.HospitalRepository;
 import com.example.Hospital.Repository.RoomRepository;
 import com.example.Hospital.model.Hospital;
 import com.example.Hospital.model.Room;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class RoomService {
@@ -27,5 +31,9 @@ public class RoomService {
         room.setHospital(hospital);
 
         return roomRepository.save(room);
+    }
+
+    public List<RoomAvailableProjection>listarQuartosComLeitosDisponiveis(){
+        return roomRepository.findRoomWithAvailableLeitos(StatusLeito.LIVRE);
     }
 }

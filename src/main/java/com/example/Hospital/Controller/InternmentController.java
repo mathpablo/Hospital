@@ -2,7 +2,9 @@ package com.example.Hospital.Controller;
 
 import com.example.Hospital.Dto.InternmentPatientDto;
 import com.example.Hospital.Enum.Specialty;
+import com.example.Hospital.Projection.HistoricoInternmentLeitoProjection;
 import com.example.Hospital.Projection.HistoricoInternmentProjection;
+import com.example.Hospital.Projection.InternmentPatientProjection;
 import com.example.Hospital.Service.InternmentService;
 import com.example.Hospital.Service.PatientService;
 import com.example.Hospital.model.InternmentLog;
@@ -82,6 +84,18 @@ public class InternmentController {
                 .<ResponseEntity<Object>>map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Paciente não está internado."));
     }
+
+    @GetMapping("/ativos/por-especialidade")
+    public ResponseEntity<List<InternmentPatientProjection>> listarInternadosṔorEspecialidade(){
+        return ResponseEntity.ok(internmentService.listarPacientesInternadosPorEspecialidade());
+    }
+
+    @GetMapping("/historico/leito/{codigoLeito}")
+    public ResponseEntity<List<HistoricoInternmentLeitoProjection>> buscarHistoricoPorLeito(@PathVariable String codigoLeito){
+        List<HistoricoInternmentLeitoProjection> historico = internmentService.buscarHistoricoPorLeito(codigoLeito);
+        return ResponseEntity.ok(historico);
+    }
+
 
 
 }
