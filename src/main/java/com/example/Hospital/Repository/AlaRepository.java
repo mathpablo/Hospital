@@ -11,4 +11,5 @@ import java.util.List;
 
 public interface AlaRepository extends JpaRepository<Ala, Long> {
     List<AlaProjection> findByHospitalId(Long hospitalId);
+    boolean existsByHospitalId(Long hospitalId);
 }

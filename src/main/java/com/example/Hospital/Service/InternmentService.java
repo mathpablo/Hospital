@@ -1,5 +1,6 @@
 package com.example.Hospital.Service;
 
+import com.example.Hospital.Dto.RoomPatientResponseDto;
 import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Enum.StatusLeito;
 import com.example.Hospital.Projection.HistoricoInternmentLeitoProjection;
@@ -127,16 +128,24 @@ public class InternmentService {
         return internmentRepository.findHistoryByPatientId(patientId, pageable);
     }
 
-    public String getQuartoPacienteInternado(Long patientId) {
+    public RoomPatientResponseDto getQuartoPacienteInternado(Long patientId) {
         Optional<InternmentLog> internacaoAtiva = internmentRepository
                 .findByPatientIdAndDataAltaIsNull(patientId);
 
-        if (internacaoAtiva.isPresent()) {
+        if (internacaoAtiva.isPresent()){
             Leito leito = internacaoAtiva.get().getLeito();
             Room room = leito.getRoom();
-            return room.getCodigo();
-        }else{
-            throw  new RuntimeException("Paciente não está internado.");
+
+            return new RoomPatientResponseDto(
+                    leito.getId(),
+                    leito.getCodigo(),
+                    leito.getStatus().toString(),
+                    leito.getSpecialty().toString(),
+                    room !=null? room.getId() :null,
+                    room !=null? room.getCodigo() :null
+            );
+        }else {
+            throw new RuntimeException("Paciente não está internado.");
         }
     }
 

@@ -23,8 +23,14 @@ public class RoomController {
         return ResponseEntity.ok(room);
     }
 
-
-
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> excluirQuarto(@PathVariable Long id) {
+        try {
+            roomService.deletarRoom(id);
+            return ResponseEntity.ok("Quarto excluído com sucesso.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
 

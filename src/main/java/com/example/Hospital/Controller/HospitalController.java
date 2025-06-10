@@ -25,7 +25,14 @@ public class HospitalController {
         return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
-
-
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> excluirHospital(@PathVariable Long id){
+        try{
+            hospitalService.deletarHospital(id);
+            return ResponseEntity.ok("Hospital exluído com sucesso.");
+        }catch (RuntimeException e){
+            return ResponseEntity.ok().body(e.getMessage());
+        }
+    }
 
 }

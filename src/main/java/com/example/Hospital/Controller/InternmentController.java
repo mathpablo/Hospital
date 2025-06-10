@@ -1,6 +1,7 @@
 package com.example.Hospital.Controller;
 
 import com.example.Hospital.Dto.InternmentPatientDto;
+import com.example.Hospital.Dto.RoomPatientResponseDto;
 import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Projection.HistoricoInternmentLeitoProjection;
 import com.example.Hospital.Projection.HistoricoInternmentProjection;
@@ -64,9 +65,9 @@ public class InternmentController {
     }
 
     @GetMapping("/paciente/{id}/quarto")
-    public ResponseEntity<String> getQuartoPacienteInternado(@PathVariable Long id){
-        String room = internmentService.getQuartoPacienteInternado(id);
-        return ResponseEntity.ok(room);
+    public ResponseEntity<RoomPatientResponseDto> getQuartoPacienteInternado(@PathVariable Long id){
+        RoomPatientResponseDto response = internmentService.getQuartoPacienteInternado(id);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/historico/paciente/{id}")

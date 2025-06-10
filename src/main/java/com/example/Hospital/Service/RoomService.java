@@ -36,4 +36,18 @@ public class RoomService {
     public List<RoomAvailableProjection>listarQuartosComLeitosDisponiveis(){
         return roomRepository.findRoomWithAvailableLeitos(StatusLeito.LIVRE);
     }
+
+    public void deletarRoom(Long id){
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Quarto não encontrado."));
+
+        boolean temLeitoOcupado = room.getLeitos().stream()
+                .anyMatch(leito -> leito.getStatus() ==StatusLeito.OCUPADO);
+
+        if(temLeitoOcupado){
+            throw new RuntimeException("Não é possível excluir os quartos, pois tem leitos ocupados");
+        }
+
+        roomRepository.delete(room);
+    }
 }

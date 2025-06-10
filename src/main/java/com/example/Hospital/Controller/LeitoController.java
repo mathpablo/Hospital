@@ -23,16 +23,6 @@ public class LeitoController {
         return ResponseEntity.ok(this.leitoService.listarQuantidadeDeLeitosLivres());
     }
 
-//    @GetMapping("/livres")
-//    public ResponseEntity<List<QuantidadeLeitoLivreProjection>> listarLeitosLivres() {
-//        List<QuantidadeLeitoLivreProjection> leitosLivres = leitoRepository.contarLeitosLivresPorSpecialty();
-//        System.out.println("Leitos livres encontrados: " + leitosLivres.size());
-//        leitosLivres.forEach(l -> System.out.println(l.getSpecialty() + ": " + l.getQuantidadeLeitosLivres()));
-//        return ResponseEntity.ok(leitosLivres);
-//    }
-
-
-
     @PutMapping("/{id}/status")
     public ResponseEntity<?> atualizarLeito(@PathVariable Long id, @RequestBody StatusDto statusDto){
         boolean atualizado = leitoService.atualizarStatus(id, statusDto.getStatus());
