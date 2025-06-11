@@ -1,6 +1,8 @@
 package com.example.Hospital.Enum;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum Specialty {
     CARDIOLOGIA("CAR"),
     NEUROLOGIA("NEU"),
@@ -14,6 +16,7 @@ public enum Specialty {
 
     }
 
+    @JsonCreator
     public String getCode(){
         return code;
     }
