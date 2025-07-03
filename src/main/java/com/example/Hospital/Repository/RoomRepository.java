@@ -3,6 +3,7 @@ package com.example.Hospital.Repository;
 import com.example.Hospital.Enum.StatusLeito;
 import com.example.Hospital.Projection.RoomAvailableProjection;
 import com.example.Hospital.model.Room;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +28,8 @@ public interface RoomRepository extends CrudRepository<Room, Long> {
             WHERE l.status =:status
             """)
     List<RoomAvailableProjection>findRoomWithAvailableLeitos(StatusLeito status);
+
+    @EntityGraph(attributePaths = {"ala", "leitos"})
+    List<Room> findAll();
+
 }

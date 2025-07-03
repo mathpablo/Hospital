@@ -37,19 +37,8 @@ public class InternmentController {
     }
 
     @PostMapping("/internar")
-    public ResponseEntity<InternmentLog> internarPaciente(@Valid @RequestBody InternmentPatientDto internarPacienteDTO) {
-        Patient patient = patientService.buscarPorId(internarPacienteDTO.getPatientId())
-                .orElseThrow(() -> new RuntimeException("Paciente não encontrado com id " + internarPacienteDTO.getPatientId()));
-
-       Specialty specialty;
-       try{
-           specialty = Specialty.fromString(internarPacienteDTO.getSpecialty());
-       }catch (IllegalArgumentException e){
-           throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-       }
-
-        InternmentLog internmentLog = internmentService.internarPaciente(patient, specialty);
-
+    public ResponseEntity<InternmentLog> internarPaciente(@Valid @RequestBody InternmentPatientDto dto) {
+        InternmentLog internmentLog = internmentService.internarPaciente(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(internmentLog);
     }
 

@@ -1,12 +1,12 @@
 package com.example.Hospital.Controller;
 
 import com.example.Hospital.Dto.QuantidadeLeitoLivreDto;
-import com.example.Hospital.Dto.StatusDto;
-import com.example.Hospital.Projection.QuantidadeLeitoLivreProjection;
 import com.example.Hospital.Service.LeitoService;
+import com.example.Hospital.model.Leito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -20,26 +20,22 @@ public class LeitoController {
 
     @GetMapping("/quantidades-livres")
     public ResponseEntity<List<QuantidadeLeitoLivreDto>> listarQuantidadeLeitosLivres() {
-        return ResponseEntity.ok(this.leitoService.listarQuantidadeDeLeitosLivres());
+        return ResponseEntity.ok(leitoService.listarQuantidadeDeLeitosLivres());
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<?> atualizarLeito(@PathVariable Long id, @RequestBody StatusDto statusDto){
-        boolean atualizado = leitoService.atualizarStatus(id, statusDto.getStatus());
-        if(atualizado){
-            return ResponseEntity.ok().build();
-        }else{
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/leito/{id}/status")
+    public ResponseEntity<Leito> atualizarStatus(@PathVariable Long id, @RequestParam String status) {
+        Leito atualizado = leitoService.atualizarStatus(id, status);
+        return ResponseEntity.ok(atualizado);
     }
 
-    @DeleteMapping("/{id}/")
-    public ResponseEntity<?>deletarLeito(@PathVariable Long id){
-        boolean deletado = leitoService.deletarLeito(id);
-        if(deletado){
-            return ResponseEntity.noContent().build();
-        }else{
-            return ResponseEntity.notFound().build();
+    @DeleteMapping("/leito/{id}")
+    public ResponseEntity<String> deletarLeito(@PathVariable Long id) {
+        try {
+            leitoService.deletarLeito(id);
+            return ResponseEntity.ok("Leito deletado com sucesso.");
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }
 }

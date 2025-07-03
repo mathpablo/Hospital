@@ -1,5 +1,6 @@
 package com.example.Hospital.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -16,7 +17,9 @@ public class Patient {
 
     private String name;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate dataNascimento;
+
 
     @OneToMany(mappedBy = "patient")
     @JsonIgnore

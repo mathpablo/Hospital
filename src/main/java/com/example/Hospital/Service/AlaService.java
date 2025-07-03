@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,17 +20,17 @@ public class AlaService {
 
     private InternmentRepository internmentRepository;
     private  AlaRepository alaRepository;
-    private  HospitalRepository hospitalRepository;
+    private  HospitalService hospitalService;
     private RoomRepository roomRepository;
     private LeitoRepository leitoRepository;
 
     public AlaService (AlaRepository alaRepository,
-                       HospitalRepository hospitalRepository,
+                       HospitalService hospitalService,
                        RoomRepository roomRepository,
                        LeitoRepository leitoRepository,
                        InternmentRepository internmentRepository){
         this.alaRepository = alaRepository;
-        this.hospitalRepository = hospitalRepository;
+        this.hospitalService = hospitalService;
         this.roomRepository = roomRepository;
         this.leitoRepository = leitoRepository;
         this.internmentRepository = internmentRepository;
@@ -38,8 +39,7 @@ public class AlaService {
     @Transactional
     public Ala criarAlaComQuartosLeitos(AlaCreateDto dto) {
 
-        Hospital hospital = hospitalRepository.findById(dto.getHospitalId())
-                .orElseThrow(() -> new RuntimeException("Hospital não encontrado"));
+        Hospital hospital = hospitalService.buscarHospitalPorId(dto.getHospitalId());
 
         Ala ala = new Ala();
         ala.setHospital(hospital);
@@ -75,22 +75,24 @@ public class AlaService {
     }
 
     @Transactional
-    public void deletarAla(Long alaId){
+    public void deletarAla(Long alaId) {
         Ala ala = alaRepository.findById(alaId)
                 .orElseThrow(() -> new RuntimeException("Ala não encontrada"));
 
         List<Room> rooms = ala.getRooms();
 
-        for(Room room : rooms){
-           List<Leito> leitos = room.getLeitos();
+        List<Leito> todosLeitos = new ArrayList<>();
+        for (Room room : rooms) {
+            todosLeitos.addAll(room.getLeitos());
+        }
 
-           for(Leito leito : leitos){
-               internmentRepository.deleteByLeito(leito);
-           }
+        if (!todosLeitos.isEmpty() && internmentRepository.existsByAnyLeito(todosLeitos)) {
+            throw new IllegalStateException("Não é possível excluir a ala: existem pacientes internados.");
         }
 
         alaRepository.delete(ala);
     }
+
 }
 
 

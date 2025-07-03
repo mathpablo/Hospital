@@ -1,5 +1,6 @@
 package com.example.Hospital.Service;
 
+import com.example.Hospital.Dto.InternmentPatientDto;
 import com.example.Hospital.Dto.RoomPatientResponseDto;
 import com.example.Hospital.Enum.Specialty;
 import com.example.Hospital.Enum.StatusLeito;
@@ -35,6 +36,9 @@ public class InternmentService {
     private InternmentRepository internmentRepository;
 
     @Autowired
+    private PatientService patientService;
+
+    @Autowired
     private LeitoRepository leitoRepository;
 
     @Autowired
@@ -46,57 +50,7 @@ public class InternmentService {
     @Autowired
     private PatientRepository patientRepository;
 
-    @Transactional
-    public InternmentLog internarPaciente(Patient patient, Specialty specialty) {
-        boolean jaInternado = internmentRepository.existsByPatientIdAndInternacaoAtiva(patient.getId());
-        System.out.println("Paciente já internado? " + jaInternado);
-        if (jaInternado) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Paciente já está internado e não pode ser internado novamente.");
-        }
-
-        Leito leito = leitoService.buscarLeitoDisponivelPorEspecialidade(specialty)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum leito disponível para a especialidade: " + specialty));
-
-        leito.setStatus(StatusLeito.OCUPADO);
-        leito.setSpecialty(specialty);
-        leito.setPatient(patient);
-        leito = leitoRepository.save(leito);
-
-        Room room = leito.getRoom();
-        if (room != null) {
-            room.setStatus(StatusLeito.OCUPADO);
-            roomRepository.save(room);
-        }
-
-        InternmentLog internmentLog = new InternmentLog();
-        internmentLog.setPatient(patient);
-        internmentLog.setLeito(leito);
-        internmentLog.setDateInternamento(LocalDateTime.now());
-
-        System.out.println("Salvando internação para paciente " + patient.getName());
-        InternmentLog saved = internmentRepository.save(internmentLog);
-        internmentRepository.flush();
-        InternmentLog check = internmentRepository.findById(saved.getId())
-                .orElseThrow(() -> new RuntimeException("Internação salva não encontrada!"));
-
-        System.out.println("Internação salva confirmada no banco: " + check);
-        return saved;
-
-    }
-
-
-    @Transactional
-    public InternmentLog darAltaPaciente(Long internmentLogId) {
-        InternmentLog internmentLog = internmentRepository.findById(internmentLogId)
-                .orElseThrow(() -> new RuntimeException("Internação não encontrada."));
-
-        if (internmentLog.getDataAlta() != null) {
-            throw new RuntimeException("Paciente já recebeu alta.");
-        }
-
-        internmentLog.setDataAlta(LocalDateTime.now());
-
-        Leito leito = internmentLog.getLeito();
+    public void liberarLeito(Leito leito) {
         leito.setStatus(StatusLeito.LIVRE);
         leito.setPatient(null);
         leitoRepository.save(leito);
@@ -111,18 +65,80 @@ public class InternmentService {
                 roomRepository.save(room);
             }
         }
+    }
 
-        Leito atualizado = leitoRepository.findById(leito.getId()).orElseThrow();
-        System.out.println("Leito atualizado: " + atualizado);
+    public InternmentLog buscarPorId(Long id){
+        return  internmentRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Internações não encontrada com o id:" + id));
+    }
 
+
+    @Transactional
+    public InternmentLog internarPaciente(InternmentPatientDto dto) {
+        Patient patient = patientService.buscarPorId(dto.getPatientId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado com id " + dto.getPatientId()));
+
+        Specialty specialty;
+        try {
+            specialty = Specialty.fromString(dto.getSpecialty());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+
+        boolean jaInternado = internmentRepository.existsByPatientIdAndInternacaoAtiva(patient.getId());
+        if (jaInternado) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Paciente já está internado.");
+        }
+
+        Leito leito = leitoService.buscarLeitoDisponivelPorEspecialidade(specialty)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Nenhum leito disponível para a especialidade: " + specialty));
+
+        leito.setStatus(StatusLeito.OCUPADO);
+        leito.setSpecialty(specialty);
+        leito.setPatient(patient);
+        leito = leitoRepository.save(leito);
+
+        Room room = leito.getRoom();
+        if (room != null) {
+            boolean todosOcupados = room.getLeitos().stream()
+                    .allMatch(l -> l.getStatus() == StatusLeito.OCUPADO);
+
+            if (todosOcupados) {
+                room.setStatus(StatusLeito.OCUPADO);
+                roomRepository.save(room);
+            }
+        }
+
+        InternmentLog log = new InternmentLog();
+        log.setPatient(patient);
+        log.setLeito(leito);
+        log.setDateInternamento(LocalDateTime.now());
+
+        return internmentRepository.save(log);
+    }
+
+
+    @Transactional
+    public InternmentLog darAltaPaciente(Long internmentLogId) {
+        InternmentLog internmentLog = buscarPorId(internmentLogId);
+
+        if (internmentLog.getDataAlta() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Paciente já recebeu alta.");
+        }
+
+        internmentLog.setDataAlta(LocalDateTime.now());
+
+        liberarLeito(internmentLog.getLeito());
 
         return internmentRepository.save(internmentLog);
     }
 
+
+
     public List<InternmentLog> listarInternacoesAtivas() {
         return internmentRepository.findInternacoesAtivas();
     }
-
 
     public Page<HistoricoInternmentProjection> buscarHistoricoPaciente(Long patientId, Pageable pageable) {
         return internmentRepository.findHistoryByPatientId(patientId, pageable);
@@ -141,8 +157,8 @@ public class InternmentService {
                     leito.getCodigo(),
                     leito.getStatus().toString(),
                     leito.getSpecialty().toString(),
-                    room !=null? room.getId() :null,
-                    room !=null? room.getCodigo() :null
+                    room.getId(),
+                    room.getCodigo()
             );
         }else {
             throw new RuntimeException("Paciente não está internado.");
@@ -160,6 +176,5 @@ public class InternmentService {
     public List<HistoricoInternmentLeitoProjection> buscarHistoricoPorLeito(String codigoLeito){
         return internmentRepository.buscarHistoricoPorLeito(codigoLeito);
     }
-
 
 }

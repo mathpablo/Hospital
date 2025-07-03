@@ -26,8 +26,15 @@ public class AlaController {
     }
 
     @DeleteMapping("/ala/{id}")
-    public ResponseEntity<Void> deletarAla(@PathVariable Long id){
-        alaService.deletarAla(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deletarAla(@PathVariable Long id) {
+        try {
+            alaService.deletarAla(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
+
 }

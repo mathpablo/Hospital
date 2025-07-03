@@ -1,7 +1,9 @@
 package com.example.Hospital.Controller;
 
+import com.example.Hospital.Dto.RoomDto;
 import com.example.Hospital.Projection.RoomAvailableProjection;
 import com.example.Hospital.Service.RoomService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,19 +20,23 @@ public class RoomController {
     }
 
     @GetMapping("/disponiveis")
-    public ResponseEntity<List<RoomAvailableProjection>>listarQuartosDisponiveis(){
-        List<RoomAvailableProjection> room = roomService.listarQuartosComLeitosDisponiveis();
-        return ResponseEntity.ok(room);
+    public ResponseEntity<List<RoomDto>> listarQuartosDisponiveis(){
+        List<RoomDto> rooms = roomService.listarQuartosComLeitosDisponiveis();
+        return ResponseEntity.ok(rooms);
     }
 
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> excluirQuarto(@PathVariable Long id) {
+    public ResponseEntity<?> excluirQuarto(@PathVariable Long id) {
         try {
             roomService.deletarRoom(id);
-            return ResponseEntity.ok("Quarto excluído com sucesso.");
+            return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
 }
 

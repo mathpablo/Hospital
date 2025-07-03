@@ -6,10 +6,9 @@ import com.example.Hospital.model.Patient;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -26,4 +25,17 @@ public class PatientController {
       PatientDto responseDto = patientService.create(patientDto);
       return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
+
+    @GetMapping("listar-pacientes")
+    public ResponseEntity<List<PatientDto>> listarPacientes() {
+        List<PatientDto> pacientes = patientService.listarTodos();
+        return ResponseEntity.ok(pacientes);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarPaciente(@PathVariable Long id) {
+        patientService.deletarPaciente(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

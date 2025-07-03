@@ -17,13 +17,10 @@ public interface LeitoRepository extends CrudRepository<Leito, Long> {
     Optional<Leito> findFirstByRoom_Ala_SpecialtyAndStatus(Specialty specialty, StatusLeito status);
 
     @Query("SELECT a.specialty AS specialty, COUNT(l) AS quantidadeLeitosLivres " +
-            "FROM Leito l JOIN l.room r JOIN r.ala a " +
+            "FROM Leito l " +
+            "JOIN Room r ON l.room = r " +
+            "JOIN Ala a ON r.ala = a " +
             "WHERE l.status = 'LIVRE' GROUP BY a.specialty")
     List<QuantidadeLeitoLivreProjection> findLeitosLivresPorEspecialidade();
-
-    @Query("SELECT l FROM Leito l JOIN FETCH l.room WHERE l.id =: id")
-    Leito findLeitoComRoom(@Param("id") Long id);
-
-
 
 }

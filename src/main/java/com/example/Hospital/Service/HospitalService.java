@@ -4,7 +4,13 @@ import com.example.Hospital.Dto.HospitalDto;
 import com.example.Hospital.Repository.AlaRepository;
 import com.example.Hospital.Repository.HospitalRepository;
 import com.example.Hospital.model.Hospital;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class HospitalService {
@@ -17,25 +23,42 @@ public class HospitalService {
         this.alaRepository = alaRepository;
     }
 
-    public HospitalDto criarHospital(HospitalDto dto) {
+    public Hospital buscarHospitalPorId(Long id){
+        return hospitalRepository.findById(id)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Hospital não encontrado com o id:" + id));
+    }
+
+    public Hospital criarHospital(Hospital hspital) {
         Hospital hospital = new Hospital();
-        hospital.setName(dto.getName());
-
-        Hospital salvo = hospitalRepository.save(hospital);
-
-        dto.setId(salvo.getId());
-        return dto;
+        hospital.setName(hospital.getName());
+        return this.hospitalRepository.save(hospital);
     }
 
-    public void deletarHospital(Long hospitalId){
-        if(!hospitalRepository.existsById(hospitalId)){
-            throw new RuntimeException("Hospital não encontrado.");
-        }
+    public ResponseEntity<String> deletarHospital(Long id) {
+        try {
+            Hospital hospital = hospitalRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Hospital não encontrado."));
 
-        if (alaRepository.existsByHospitalId(hospitalId)){
-            throw new RuntimeException("Não é possível excluir o hospital. Existem alas associadas a esse hospital. ");
+            hospitalRepository.delete(hospital);
+            return ResponseEntity.ok("Hospital excluído com sucesso.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-        hospitalRepository.deleteById(hospitalId);
     }
+
+
+    public List<HospitalDto> listarHospitais() {
+        List<Hospital> hospitais = hospitalRepository.findAll();
+
+        List<HospitalDto> dtos = hospitais.stream().map(hospital -> {
+            HospitalDto dto = new HospitalDto();
+            dto.setId(hospital.getId());
+            dto.setName(hospital.getName());
+
+            return dto;
+        }).collect(Collectors.toList());
+
+        return dtos;
+    }
+
 }

@@ -104,7 +104,14 @@ public interface InternmentRepository extends JpaRepository<InternmentLog, Long>
                 JOIN ala a ON r.ala_id = a.id
                 JOIN hospital h ON a.hospital_id = h.id
                 JOIN patient p ON il.patient_id = p.id
-                WHERE r.codigo = :codigoLeito
+                WHERE l.codigo = :codigoLeito
             """, nativeQuery = true)
     List<HistoricoInternmentLeitoProjection> buscarHistoricoPorLeito(@Param("codigoLeito") String codigoLeito);
+
+    List<InternmentLog> findByLeitoId(Long leitoId);
+
+    @Query("SELECT CASE WHEN COUNT(i) > 0 THEN true ELSE false END FROM InternmentLog i WHERE i.leito IN :leitos AND i.dataAlta IS NULL")
+    boolean existsByAnyLeito(@Param("leitos") List<Leito> leitos);
+
+    boolean existsByPatientIdAndDataAltaIsNull(Long patientId);
 }

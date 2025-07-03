@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class QuantidadeLeitoLivreDto {
     private Specialty specialty;
-    private Long quantidadeLeitoLivre;
+    private Long quantidadeLeitoLivres;
 
 
     public QuantidadeLeitoLivreDto(QuantidadeLeitoLivreProjection projection) {
         this.specialty = projection.getSpecialty();
-        this.quantidadeLeitoLivre = projection.getQuantidadeLeitosLivres();
+        this.quantidadeLeitoLivres = projection.getQuantidadeLeitosLivres();
     }
 }
 
